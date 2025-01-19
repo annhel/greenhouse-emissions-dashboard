@@ -10,7 +10,7 @@ import NavPane from "../components/NavPane/NavPane";
 
 export type DataOverviewPageProps = {};
 
-const COUNTRY_TO_ABBRV: { [key: string]: string } = {
+export const COUNTRY_TO_ABBRV: { [key: string]: string } = {
   US: "United States",
   JPN: "Japan",
   CHN: "China",
@@ -24,25 +24,32 @@ export default function OverviewPage() {
   const [metaData, setMetaData] = useState<any>(null);
   const [emissionsData, setEmissionsData] = useState<any>(null);
   const [error, setError] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     // Retrieves emissions data for the United States by default
-    axios
-      .get(
-        `https://api.worldbank.org/v2/country/${country}/indicator/EN.GHG.ALL.MT.CE.AR5?format=json`
-      )
-      .then(function (response) {
+    const fetchData = async () => {
+      try {
+        setLoading(true); 
+        const response = await axios.get(
+          `https://api.worldbank.org/v2/country/${country}/indicator/EN.GHG.ALL.MT.CE.AR5?format=json`
+        );
         console.log(response.data);
+
         if (response.data[0].message) {
           setError(response.data[0].message);
         } else {
           setEmissionsData(response.data[1]);
           setMetaData(response.data[0]);
         }
-      })
-      .catch(function (error) {
-        setError(error);
-      });
+      } catch (err: any) {
+        setError(err.message || "An error occurred");
+      } finally {
+        setLoading(false); // End loading
+      }
+    };
+
+    fetchData();
   }, [country]);
 
   const setXAxisLabels = () => {
@@ -70,15 +77,6 @@ export default function OverviewPage() {
   const hasEmissionsValue = (dataEntry: any) => {
     return dataEntry.value === null;
   };
-
-  if (error) {
-    return (
-      <>
-        <NavPane />
-        <div style={{ margin: "4rem 5rem", width: "100%" }}></div>
-      </>
-    );
-  }
 
   const determineTotalEmissions = () => {
     return Math.round(
@@ -135,71 +133,76 @@ export default function OverviewPage() {
             }}
           >
             <h1 style={{ color: "#022d5b" }}>
-              Overview:{" "}
+              Greenhouse Gas Emissions in{" "}
               <span style={{ color: "#f5c504" }}>
                 {COUNTRY_TO_ABBRV[country]}
               </span>
             </h1>
             <span style={{ marginLeft: ".25rem" }}>
               <StandardMenu
-                label={<ExpandCircleDownIcon />}
-                options={["US", "JPN", "BRA"]}
+                label={"Select a Country"}
+                options={["US", "JPN", "CHN", "IND", "FRA", "BRA"]}
                 setOption={setCountry}
               />
             </span>
           </div>
-          <div style={{ color: "grey" }}>
-            {/* Last updated: {metaData.lastupdated} */}
-          </div>
         </div>
-        <FiltersPane />
-        <div>
-          <div
-            style={{
-              justifyContent: "space-evenly",
-              display: "flex",
-              width: "100%",
-              marginTop: "3rem",
-            }}
-          >
-            <DataCard
-              value={determineTotalEmissions()}
-              label={"Total greenhouse emissions"}
-              insight={"From Startdate - Enddate"}
-            />
-            <DataCard
-              value={findHighestYearOfEmissions().date}
-              label={"Highest recorded greenhouse emissions in a year"}
-              insight={`${findHighestYearOfEmissions().value} Mt CO2e`}
-            />
-            <DataCard
-              value={determinePercentChangeOfEmissions()}
-              label={"% change of emissions from StartDate - EndDate"}
-              insight={"45% increase from 2023"}
-            />
-          </div>
-        </div>
-        {emissionsData !== null && (
-          <div style={{ display: "flex", marginTop: "6rem" }}>
-            <BarChart
-              xAxis={[
-                {
-                  scaleType: "band",
-                  data: setXAxisLabels(),
-                  label: "Year",
-                  colorMap: { type: "ordinal", colors: ["#94B4CC"] },
-                },
-              ]}
-              yAxis={[
-                {
-                  max: 8000,
-                },
-              ]}
-              series={setDataValues()}
-              width={800}
-              height={400}
-            />
-            {/* <LineChart
+        {/* <FiltersPane /> */}
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p>Error loading data</p>
+        ) : (
+          <>
+            <div style={{ color: "grey" }}>
+              Last updated: {metaData.lastupdated}
+            </div>
+            <div>
+              <div
+                style={{
+                  justifyContent: "space-evenly",
+                  display: "flex",
+                  width: "100%",
+                  marginTop: "3rem",
+                }}
+              >
+                <DataCard
+                  value={determineTotalEmissions()}
+                  label={"Total greenhouse emissions"}
+                  insight={"From Startdate - Enddate"}
+                />
+                <DataCard
+                  value={findHighestYearOfEmissions().date}
+                  label={"Highest recorded greenhouse emissions in a year"}
+                  insight={`${findHighestYearOfEmissions().value} Mt CO2e`}
+                />
+                <DataCard
+                  value={determinePercentChangeOfEmissions()}
+                  label={"% change of emissions from StartDate - EndDate"}
+                  insight={"45% increase from 2023"}
+                />
+              </div>
+              {emissionsData !== null && (
+                <div style={{ display: "flex", marginTop: "6rem" }}>
+                  <BarChart
+                    xAxis={[
+                      {
+                        scaleType: "band",
+                        data: setXAxisLabels(),
+                        label: "Year",
+                        colorMap: { type: "ordinal", colors: ["#94B4CC"] },
+                      },
+                    ]}
+                    yAxis={[
+                      {
+                        max: 16000,
+                      },
+                    ]}
+                    series={setDataValues()}
+                    width={800}
+                    height={400}
+                  />
+                  {/* <LineChart
               xAxis={[
                 { scaleType: "band", data: setXAxisLabels(), label: "Year" },
               ]}
@@ -212,7 +215,10 @@ export default function OverviewPage() {
               width={500}
               height={300}
             /> */}
-          </div>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
     </>
