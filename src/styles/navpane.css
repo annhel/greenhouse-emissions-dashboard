@@ -1,0 +1,27 @@
+.nav-pane-container {
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.nav-button {
+  display: flex;
+  border: none;
+  background: #022d5b;
+  padding: 15px;
+  font-size: larger;
+  color: #a0a0a0;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding-left: 4rem;
+}
+
+.nav-button:active {
+  background: #003874;
+  color: #f5c504;
+}
+
+.nav-button.active {
+  background: #003874;
+  color: #f5c504;
+}

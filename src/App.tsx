@@ -1,25 +1,21 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import OverviewPage from "./pages/OverviewPage";
+import NavPane from "./components/NavPane/NavPane";
+import ComparePage from "./pages/ComparePage";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function App() {
+  const [currentPage, setCurrentPage] = useState<string>("Overview");
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <span style={{ display: "flex" }}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<OverviewPage />} />
+          <Route path="/compare" element={<ComparePage />} />
+        </Routes>
+      </BrowserRouter>
+    </span>
   );
 }
 
