@@ -1,0 +1,35 @@
+.color-primary{
+    color: #022d5b;
+}
+
+.color-accent{
+    color: #f5c504;
+}
+
+.display-flex {
+  display: flex;
+}
+
+.flex-dir-col {
+  flex-direction: column;
+}
+
+.justify-space-between {
+  justify-content: space-between;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.no-wrap{
+    flex-wrap: nowrap;
+}
+
+.width-100{
+    width: 100%;
+}
+
+.mt-3rem{
+    margin-top: 3rem;
+}

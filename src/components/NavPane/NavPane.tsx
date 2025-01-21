@@ -1,13 +1,16 @@
-import CollapseButton from "./CollapseButton";
 import NavButtons from "./NavButtons";
 
 export default function NavPane() {
-
   return (
     <>
       <div
         className="nav-pane-container"
-        style={{ maxWidth: "20%", height: "100vh", background: "#022d5b" }}
+        style={{
+          width: "20%",
+          height: "100vh",
+          background: "#022d5b",
+          position: "fixed",
+        }}
       >
         <div style={{ color: "white", margin: "4rem" }}>
           <div

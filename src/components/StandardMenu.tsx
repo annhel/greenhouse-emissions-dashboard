@@ -31,6 +31,7 @@ export default function StandardMenu({
   return (
     <div>
       <Button
+        style={{ color: "#94B4CC" }}
         id="basic-button"
         aria-controls={open ? "basic-menu" : undefined}
         aria-haspopup="true"

@@ -1,0 +1,9 @@
+.page-container{
+    margin: 4rem 5rem 4rem calc(20% + 4rem);
+    background-size: cover;
+}
+
+.page-sub-header{
+    color: grey;
+    max-width: 60%;
+}

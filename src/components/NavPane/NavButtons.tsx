@@ -29,7 +29,7 @@ export default function NavButtons() {
 
   return (
     <>
-      <div style={{ display: "flex", flexDirection: "column" }}>
+      <div className="display-flex flex-dir-col">
         {navItems.map((navItem) => (
           <button
             key={navItem.label}

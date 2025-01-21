@@ -1,23 +1,12 @@
-import { BarChart, LineChart } from "@mui/x-charts";
-import FiltersPane from "../components/FiltersPane";
+import { BarChart } from "@mui/x-charts";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import {} from "@mui/icons-material";
 import DataCard from "../components/DataCard";
-import StandardMenu from "../components/StandardMenu";
-import ExpandCircleDownIcon from "@mui/icons-material/ExpandCircleDown";
 import NavPane from "../components/NavPane/NavPane";
+import StandardMenu from "../components/StandardMenu";
+import { ABBRV_TO_COUNTRY, COUNTRIES_ABBREV } from "../utils/constants";
+import { getAllEmissionsByCountry } from "../api/WorldBankApi";
 
 export type DataOverviewPageProps = {};
-
-export const COUNTRY_TO_ABBRV: { [key: string]: string } = {
-  US: "United States",
-  JPN: "Japan",
-  CHN: "China",
-  IND: "India",
-  FRA: "France",
-  BRA: "Brazil",
-};
 
 export default function OverviewPage() {
   const [country, setCountry] = useState<string>("US");
@@ -27,14 +16,11 @@ export default function OverviewPage() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Retrieves emissions data for the United States by default
-    const fetchData = async () => {
+    // Retrieves emissions data on page load
+    const fetchEmissionsData = async () => {
       try {
-        setLoading(true); 
-        const response = await axios.get(
-          `https://api.worldbank.org/v2/country/${country}/indicator/EN.GHG.ALL.MT.CE.AR5?format=json`
-        );
-        console.log(response.data);
+        setLoading(true);
+        const response = await getAllEmissionsByCountry(country);
 
         if (response.data[0].message) {
           setError(response.data[0].message);
@@ -45,22 +31,22 @@ export default function OverviewPage() {
       } catch (err: any) {
         setError(err.message || "An error occurred");
       } finally {
-        setLoading(false); // End loading
+        setLoading(false);
       }
     };
 
-    fetchData();
+    fetchEmissionsData();
   }, [country]);
 
+  // Returns a list of the range of years for the dataset
   const setXAxisLabels = () => {
-    if (emissionsData) {
-      return emissionsData.reverse().map((dataEntry: any) => dataEntry.date);
-    }
+    return emissionsData.reverse().map((dataEntry: any) => dataEntry.date);
   };
 
+  // Returns a list containing only the data values
   const setDataValues = () => {
     if (emissionsData) {
-      // Returns the the data values for the past years
+      // Returns the the data values for x years
       return [
         {
           data: emissionsData
@@ -78,6 +64,7 @@ export default function OverviewPage() {
     return dataEntry.value === null;
   };
 
+  // Returns the sum of emissions for a given dataset
   const determineTotalEmissions = () => {
     return Math.round(
       emissionsData
@@ -90,6 +77,7 @@ export default function OverviewPage() {
     );
   };
 
+  // Returns the % change of emissions from the latest and first year od recorded emissions
   const determinePercentChangeOfEmissions = () => {
     const data = emissionsData.filter(
       (dataEntry: any) => dataEntry.value !== null
@@ -103,6 +91,7 @@ export default function OverviewPage() {
     return Math.round(result * 10) / 10;
   };
 
+  // Returns the year with the highest recorded emissions
   const findHighestYearOfEmissions = () => {
     return emissionsData.reduce((highestYear: any, currentYear: any) => {
       if (currentYear.value === null) return highestYear;
@@ -116,56 +105,35 @@ export default function OverviewPage() {
   return (
     <>
       <NavPane />
-      <div style={{ margin: "4rem 5rem", width: "100%" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            width: "100%",
-            justifyContent: "space-between",
-          }}
-        >
-          <div
-            style={{
-              alignItems: "center",
-              flexWrap: "nowrap",
-              display: "flex",
-            }}
-          >
-            <h1 style={{ color: "#022d5b" }}>
-              Greenhouse Gas Emissions in{" "}
-              <span style={{ color: "#f5c504" }}>
-                {COUNTRY_TO_ABBRV[country]}
-              </span>
-            </h1>
-            <span style={{ marginLeft: ".25rem" }}>
-              <StandardMenu
-                label={"Select a Country"}
-                options={["US", "JPN", "CHN", "IND", "FRA", "BRA"]}
-                setOption={setCountry}
-              />
-            </span>
-          </div>
+      <div className="page-container width-100">
+        <div className="width-100 display-flex align-center">
+          <h1 style={{ color: "#022d5b" }}>
+            Greenhouse Gas Emissions in{" "}
+            <span className="color-accent">{ABBRV_TO_COUNTRY[country]}</span>
+          </h1>
+          <span style={{ marginLeft: ".25rem" }}>
+            <StandardMenu
+              label={"Change Country"}
+              options={COUNTRIES_ABBREV}
+              setOption={setCountry}
+            />
+          </span>
         </div>
-        {/* <FiltersPane /> */}
         {loading ? (
           <p>Loading...</p>
         ) : error ? (
           <p>Error loading data</p>
         ) : (
           <>
-            <div style={{ color: "grey" }}>
-              Last updated: {metaData.lastupdated}
+            <div className="page-sub-header">
+              Explore the trends and patterns in greenhouse gas emissions for{" "}
+              {ABBRV_TO_COUNTRY[country]}. Discover total emissions over time,
+              review peak years, and understand recent changes. This data was
+              last updated by the World Bank on: {metaData.lastupdated}
             </div>
-            <div>
-              <div
-                style={{
-                  justifyContent: "space-evenly",
-                  display: "flex",
-                  width: "100%",
-                  marginTop: "3rem",
-                }}
-              >
+            <div className="mt-3rem">
+              <h2 className="color-primary">Key Insights</h2>
+              <div className="display-flex justify-space-between width-100">
                 <DataCard
                   value={determineTotalEmissions()}
                   label={"Total greenhouse emissions"}
@@ -182,27 +150,28 @@ export default function OverviewPage() {
                   insight={"45% increase from 2023"}
                 />
               </div>
-              {emissionsData !== null && (
-                <div style={{ display: "flex", marginTop: "6rem" }}>
-                  <BarChart
-                    xAxis={[
-                      {
-                        scaleType: "band",
-                        data: setXAxisLabels(),
-                        label: "Year",
-                        colorMap: { type: "ordinal", colors: ["#94B4CC"] },
-                      },
-                    ]}
-                    yAxis={[
-                      {
-                        max: 16000,
-                      },
-                    ]}
-                    series={setDataValues()}
-                    width={800}
-                    height={400}
-                  />
-                  {/* <LineChart
+            </div>
+            {emissionsData !== null && (
+              <div className="display-flex mt-3rem">
+                <BarChart
+                  xAxis={[
+                    {
+                      scaleType: "band",
+                      data: setXAxisLabels(),
+                      label: "Year",
+                      colorMap: { type: "ordinal", colors: ["#94B4CC"] },
+                    },
+                  ]}
+                  yAxis={[
+                    {
+                      max: 16000,
+                    },
+                  ]}
+                  series={setDataValues()}
+                  width={800}
+                  height={400}
+                />
+                {/* <LineChart
               xAxis={[
                 { scaleType: "band", data: setXAxisLabels(), label: "Year" },
               ]}
@@ -215,9 +184,8 @@ export default function OverviewPage() {
               width={500}
               height={300}
             /> */}
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </>
         )}
       </div>
