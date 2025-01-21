@@ -19,28 +19,29 @@ const MenuProps = {
   },
 };
 
-function getStyles(name: string, personName: readonly string[], theme: Theme) {
+function getStyles(name: string, selectedOptions: readonly string[], theme: Theme) {
   return {
-    fontWeight: personName.includes(name)
+    fontWeight: selectedOptions.includes(name)
       ? theme.typography.fontWeightMedium
       : theme.typography.fontWeightRegular,
   };
 }
 
 export type MultiSelectChip = {
-  options: string[] ;
+  selectedOptions: string[]
+  options: string[];
   label: string;
+  setSelectedOptions: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
-export default function MultiSelectChip({ options, label }: MultiSelectChip) {
+export default function MultiSelectChip({ options, label, setSelectedOptions, selectedOptions }: MultiSelectChip) {
   const theme = useTheme();
-  const [personName, setPersonName] = React.useState<string[]>([]);
 
-  const handleChange = (event: SelectChangeEvent<typeof personName>) => {
+  const handleChange = (event: SelectChangeEvent<typeof selectedOptions>) => {
     const {
       target: { value },
     } = event;
-    setPersonName(
+    setSelectedOptions(
       // On autofill we get a stringified value.
       typeof value === "string" ? value.split(",") : value
     );
@@ -49,18 +50,14 @@ export default function MultiSelectChip({ options, label }: MultiSelectChip) {
   return (
     <div>
       <FormControl sx={{ m: 1, width: 300 }}>
-        <InputLabel id="country-multi-select-label">
-          {label}
-        </InputLabel>
+        <InputLabel id="country-multi-select-label">{label}</InputLabel>
         <Select
           labelId="country-multi-select-label"
           id="country-multi-select"
           multiple
-          value={personName}
+          value={selectedOptions}
           onChange={handleChange}
-          input={
-            <OutlinedInput id="select-multiple-chip" label={label} />
-          }
+          input={<OutlinedInput id="select-multiple-chip" label={label} />}
           renderValue={(selected) => (
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
               {selected.map((value) => (
@@ -70,13 +67,13 @@ export default function MultiSelectChip({ options, label }: MultiSelectChip) {
           )}
           MenuProps={MenuProps}
         >
-          {options.map((option) => (
+          {options.map((o) => (
             <MenuItem
-              key={option}
-              value={option}
-              style={getStyles(option, personName, theme)}
+              key={o}
+              value={o}
+              style={getStyles(o, selectedOptions, theme)}
             >
-              {option}
+              {o}
             </MenuItem>
           ))}
         </Select>

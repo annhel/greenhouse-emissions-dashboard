@@ -1,9 +1,19 @@
 import Typography from "@mui/material/Typography";
 import { COUNTRIES_ABBREV } from "../utils/constants";
 import MultiSelectChip from "./MultiSelectChip";
-import Slider from "./Slider";
+import MinimumDistanceSlider from "./MinimumDistanceSlider";
 
-export default function FiltersPane() {
+export type FiltersPaneProps = {
+  countries: string[];
+  setCountries: React.Dispatch<React.SetStateAction<string[]>>;
+  setYears: React.Dispatch<React.SetStateAction<string[]>>;
+};
+
+export default function FiltersPane({
+  countries,
+  setCountries,
+  setYears,
+}: FiltersPaneProps) {
   return (
     <>
       <div
@@ -13,10 +23,15 @@ export default function FiltersPane() {
           alignItems: "center",
         }}
       >
-        <MultiSelectChip options={COUNTRIES_ABBREV} label="Select Countries" />
+        <MultiSelectChip
+          options={COUNTRIES_ABBREV}
+          label="Select Countries"
+          selectedOptions={countries}
+          setSelectedOptions={setCountries}
+        />
         <div>
           <Typography gutterBottom>Select a Date Range</Typography>
-          <Slider />
+          <MinimumDistanceSlider setRange={setYears} />
         </div>
       </div>
     </>

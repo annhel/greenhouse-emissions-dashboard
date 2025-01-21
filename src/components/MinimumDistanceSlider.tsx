@@ -1,6 +1,6 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Slider from '@mui/material/Slider';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Slider from "@mui/material/Slider";
 
 function valuetext(value: number) {
   return `${value}°C`;
@@ -8,13 +8,19 @@ function valuetext(value: number) {
 
 const minDistance = 0;
 
-export default function MinimumDistanceSlider() {
+export type MinimumDistanceSliderProps = {
+  setRange: React.Dispatch<React.SetStateAction<string[]>>;
+};
+
+export default function MinimumDistanceSlider({
+  setRange,
+}: MinimumDistanceSliderProps) {
   const [value1, setValue1] = React.useState<number[]>([1974, 2023]);
 
   const handleChange1 = (
     event: Event,
     newValue: number | number[],
-    activeThumb: number,
+    activeThumb: number
   ) => {
     if (!Array.isArray(newValue)) {
       return;
@@ -30,7 +36,7 @@ export default function MinimumDistanceSlider() {
   return (
     <Box sx={{ width: 300 }}>
       <Slider
-        getAriaLabel={() => 'Minimum distance'}
+        getAriaLabel={() => "Minimum distance"}
         value={value1}
         onChange={handleChange1}
         valueLabelDisplay="auto"
