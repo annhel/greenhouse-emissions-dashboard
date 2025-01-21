@@ -147,43 +147,34 @@ export default function OverviewPage() {
                 <DataCard
                   value={determinePercentChangeOfEmissions()}
                   label={"% change of emissions from StartDate - EndDate"}
-                  insight={"45% increase from 2023"}
                 />
               </div>
             </div>
             {emissionsData !== null && (
-              <div className="display-flex mt-3rem">
-                <BarChart
-                  xAxis={[
-                    {
-                      scaleType: "band",
-                      data: setXAxisLabels(),
-                      label: "Year",
-                      colorMap: { type: "ordinal", colors: ["#94B4CC"] },
-                    },
-                  ]}
-                  yAxis={[
-                    {
-                      max: 16000,
-                    },
-                  ]}
-                  series={setDataValues()}
-                  width={800}
-                  height={400}
-                />
-                {/* <LineChart
-              xAxis={[
-                { scaleType: "band", data: setXAxisLabels(), label: "Year" },
-              ]}
-              yAxis={[
-                {
-                  max: 8000,
-                },
-              ]}
-              series={setDataValues()}
-              width={500}
-              height={300}
-            /> */}
+              <div className="mt-3rem">
+                <div className="display-flex flex-dir-col align-center">
+                  <h3 className="color-primary">
+                    Historical Greenhouse Gas Emissions by Year (Mt CO2e)
+                  </h3>
+                  <BarChart
+                    xAxis={[
+                      {
+                        scaleType: "band",
+                        data: setXAxisLabels(),
+                        label: "Year",
+                        colorMap: { type: "ordinal", colors: ["#94B4CC"] },
+                      },
+                    ]}
+                    yAxis={[
+                      {
+                        // max: 16000
+                      },
+                    ]}
+                    series={setDataValues()}
+                    width={800}
+                    height={400}
+                  />
+                </div>
               </div>
             )}
           </>
@@ -192,3 +183,19 @@ export default function OverviewPage() {
     </>
   );
 }
+
+// {
+//   /* <LineChart
+//               xAxis={[
+//                 { scaleType: "band", data: setXAxisLabels(), label: "Year" },
+//               ]}
+//               yAxis={[
+//                 {
+//                   max: 8000,
+//                 },
+//               ]}
+//               series={setDataValues()}
+//               width={500}
+//               height={300}
+//             /> */
+// }
