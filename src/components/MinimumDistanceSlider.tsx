@@ -9,14 +9,14 @@ function valuetext(value: number) {
 const minDistance = 0;
 
 export type MinimumDistanceSliderProps = {
-  setRange: React.Dispatch<React.SetStateAction<string[]>>;
+  range: number[];
+  setRange: React.Dispatch<React.SetStateAction<number[]>>;
 };
 
 export default function MinimumDistanceSlider({
+  range,
   setRange,
 }: MinimumDistanceSliderProps) {
-  const [value1, setValue1] = React.useState<number[]>([1974, 2023]);
-
   const handleChange1 = (
     event: Event,
     newValue: number | number[],
@@ -27,9 +27,9 @@ export default function MinimumDistanceSlider({
     }
 
     if (activeThumb === 0) {
-      setValue1([Math.min(newValue[0], value1[1] - minDistance), value1[1]]);
+      setRange([Math.min(newValue[0], range[1] - minDistance), range[1]]);
     } else {
-      setValue1([value1[0], Math.max(newValue[1], value1[0] + minDistance)]);
+      setRange([range[0], Math.max(newValue[1], range[0] + minDistance)]);
     }
   };
 
@@ -37,7 +37,7 @@ export default function MinimumDistanceSlider({
     <Box sx={{ width: 300 }}>
       <Slider
         getAriaLabel={() => "Minimum distance"}
-        value={value1}
+        value={range}
         onChange={handleChange1}
         valueLabelDisplay="auto"
         getAriaValueText={valuetext}

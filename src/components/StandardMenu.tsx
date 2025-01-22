@@ -19,7 +19,7 @@ export default function StandardMenu({
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = (option: string) => {
+  const handleClose = () => {
     setAnchorEl(null);
   };
 
@@ -50,7 +50,9 @@ export default function StandardMenu({
         }}
       >
         {options.map((option) => (
-          <MenuItem onClick={() => handleSelection(option)}>{option}</MenuItem>
+          <MenuItem key={option} onClick={() => handleSelection(option)}>
+            {option}
+          </MenuItem>
         ))}
       </Menu>
     </div>

@@ -4,11 +4,13 @@ import { getAllEmissionsByCountry } from "../api/WorldBankApi";
 import FiltersPane from "../components/FiltersPane";
 import NavPane from "../components/NavPane/NavPane";
 import { EmissionsDataResponseAndCountry } from "../types/EmissionsData";
+import { range } from "../utils/helpers";
+import { getValuesFromData } from "../utils/emissionsDataProcessing";
 
 export default function ComparePage() {
   const [countries, setCountries] = useState<string[]>([]);
-  const [years, setYears] = useState<string[]>([]);
-  const [emissionsData, setEmissionsData] = useState<
+  const [years, setYears] = useState<number[]>([1974, 2023]);
+  const [emissionsDataResponses, setEmissionsDataResponses] = useState<
     EmissionsDataResponseAndCountry[]
   >([]);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +25,7 @@ export default function ComparePage() {
 
         for (const country of countries) {
           // Skips if that country's data has already been fetched
-          if (emissionsData.find((data) => data.country === country)) {
+          if (emissionsDataResponses.find((data) => data.country === country)) {
             continue;
           }
 
@@ -44,7 +46,7 @@ export default function ComparePage() {
           }
         }
 
-        setEmissionsData((prev) => [...prev, ...newData]);
+        setEmissionsDataResponses((prev) => [...prev, ...newData]);
       } catch (err: any) {
         setError(err.message || "An error occurred");
       } finally {
@@ -52,10 +54,24 @@ export default function ComparePage() {
       }
     };
 
-    if (countries.length >= 1) {
+    if (
+      countries.length >= 2 &&
+      countries.length > emissionsDataResponses.length
+    ) {
       fetchEmissionsData();
     }
+
+    if (countries.length < emissionsDataResponses.length) {
+      setEmissionsDataResponses((prev) =>
+        prev.filter((res) => countries.includes(res.country))
+      );
+    }
   }, [countries, years]);
+
+  const values =
+    getValuesFromData(
+      emissionsDataResponses as EmissionsDataResponseAndCountry[]
+    ) || [];
 
   return (
     <>
@@ -71,6 +87,7 @@ export default function ComparePage() {
         <FiltersPane
           countries={countries}
           setCountries={setCountries}
+          years={years}
           setYears={setYears}
         />
         {countries.length < 2 ? (
@@ -94,17 +111,24 @@ export default function ComparePage() {
               <h2 className="color-primary">Key Insights</h2>
             </div>
             <div>
-              //
               <BarChart
-                xAxis={[{ scaleType: "band", data: [], label: "Year" }]}
-                yAxis={[
+                xAxis={[
                   {
-                    max: 8000,
+                    scaleType: "band",
+                    data: range(years[0], years[1], 1),
+                    label: "Year",
                   },
                 ]}
-                series={[{ data: [] }]}
-                width={500}
-                height={300}
+                yAxis={
+                  [
+                    // {
+                    //   max: 8000,
+                    // },
+                  ]
+                }
+                series={values}
+                width={1200}
+                height={400}
               />
             </div>
           </>

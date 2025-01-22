@@ -4,26 +4,31 @@ import { getAllEmissionsByCountry } from "../api/WorldBankApi";
 import DataCard from "../components/DataCard";
 import NavPane from "../components/NavPane/NavPane";
 import StandardMenu from "../components/StandardMenu";
-import { EmissionsDataResponse } from "../types/EmissionsData";
+import {
+  EmissionsData,
+  EmissionsDataResponseAndCountry
+} from "../types/EmissionsData";
 import { ABBRV_TO_COUNTRY, COUNTRIES_ABBREV } from "../utils/constants";
 import {
   determinePercentChangeOfEmissions,
   determineTotalEmissions,
   findHighestYearOfEmissions,
+  getValuesFromData,
+  getYearsFromData,
 } from "../utils/emissionsDataProcessing";
 
 export type DataOverviewPageProps = {};
 
 export default function OverviewPage() {
   const [country, setCountry] = useState<string>("US");
-  const [emissionsData, setEmissionsData] =
-    useState<EmissionsDataResponse | null>(null);
+  const [emissionsDataResponse, setEmissionsDataResponse] =
+    useState<EmissionsDataResponseAndCountry | null>(null);
 
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   const emissionsDataIsNullOrUndefined =
-    emissionsData === null || emissionsData === undefined;
+    emissionsDataResponse === null || emissionsDataResponse === undefined;
 
   useEffect(() => {
     // Retrieves emissions data on page load
@@ -35,7 +40,7 @@ export default function OverviewPage() {
         if (response.data[0].message) {
           setError(response.data[0].message);
         } else {
-          setEmissionsData(response.data);
+          setEmissionsDataResponse({ country, data: response.data });
         }
       } catch (err: any) {
         setError(err.message || "An error occurred");
@@ -47,31 +52,21 @@ export default function OverviewPage() {
     fetchEmissionsData();
   }, [country]);
 
-  // Returns a list of the range of years for the dataset
-  const setXAxisLabels = () => {
-    if (emissionsDataIsNullOrUndefined) {
-      return [];
-    } else {
-      return emissionsData[1].reverse().map((dataEntry: any) => dataEntry.date);
-    }
-  };
+  const lastUpdated = emissionsDataResponse?.data[0]?.lastupdated || "Unknown";
+  const emissionsData = (emissionsDataResponse?.data[1] ||
+    []) as EmissionsData[];
 
-  // Returns a list containing only the data values
-  const setDataValues = () => {
-    if (!emissionsDataIsNullOrUndefined) {
-      // Returns the the data values for x years
-      return [
-        {
-          data: emissionsData
-            .reverse()
-            .map((dataEntry: any) => dataEntry.value),
-        },
-      ];
-    } else {
-      // Fallback for if there's no data to display
-      return [{ data: [] }];
-    }
+  const totalEmissions = determineTotalEmissions(emissionsData) || -1;
+  const highestYear = findHighestYearOfEmissions(emissionsData) || {
+    year: -1,
+    value: -1,
   };
+  const percentChange = determinePercentChangeOfEmissions(emissionsData) || -1;
+  const years = getYearsFromData(emissionsData) || [];
+  const values =
+    getValuesFromData([
+      emissionsDataResponse as EmissionsDataResponseAndCountry,
+    ]) || [];
 
   return (
     <>
@@ -105,25 +100,23 @@ export default function OverviewPage() {
               Explore the trends and patterns in greenhouse gas emissions for{" "}
               {ABBRV_TO_COUNTRY[country]}. Discover total emissions over time,
               review peak years, and understand recent changes. This data was
-              last updated by the World Bank on: {emissionsData[0].lastupdated}
+              last updated by the World Bank on: {lastUpdated}
             </div>
             <div className="mt-3rem">
               <h2 className="color-primary">Key Insights</h2>
               <div className="display-flex justify-space-between width-100">
                 <DataCard
-                  value={determineTotalEmissions(emissionsData[1])}
+                  value={totalEmissions}
                   label={"Total greenhouse emissions"}
                   insight={"From Startdate - Enddate"}
                 />
                 <DataCard
-                  value={findHighestYearOfEmissions(emissionsData[1])!.date}
+                  value={highestYear.year}
                   label={"Highest recorded greenhouse emissions in a year"}
-                  insight={`${
-                    findHighestYearOfEmissions(emissionsData[1])!.value
-                  } Mt CO2e`}
+                  insight={`${highestYear?.value} Mt CO2e`}
                 />
                 <DataCard
-                  value={determinePercentChangeOfEmissions(emissionsData[1])!}
+                  value={percentChange}
                   label={"% change of emissions from StartDate - EndDate"}
                 />
               </div>
@@ -138,7 +131,7 @@ export default function OverviewPage() {
                     xAxis={[
                       {
                         scaleType: "band",
-                        data: setXAxisLabels(),
+                        data: years,
                         label: "Year",
                         // colorMap: { type: "ordinal", colors: ["#94B4CC"] },
                       },
@@ -148,7 +141,7 @@ export default function OverviewPage() {
                         // max: 16000
                       },
                     ]}
-                    series={setDataValues()}
+                    series={values}
                     width={1200}
                     height={400}
                   />

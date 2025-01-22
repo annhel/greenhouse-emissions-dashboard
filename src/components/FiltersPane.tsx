@@ -6,12 +6,14 @@ import MinimumDistanceSlider from "./MinimumDistanceSlider";
 export type FiltersPaneProps = {
   countries: string[];
   setCountries: React.Dispatch<React.SetStateAction<string[]>>;
-  setYears: React.Dispatch<React.SetStateAction<string[]>>;
+  years: number[];
+  setYears: React.Dispatch<React.SetStateAction<number[]>>;
 };
 
 export default function FiltersPane({
   countries,
   setCountries,
+  years,
   setYears,
 }: FiltersPaneProps) {
   return (
@@ -31,7 +33,7 @@ export default function FiltersPane({
         />
         <div>
           <Typography gutterBottom>Select a Date Range</Typography>
-          <MinimumDistanceSlider setRange={setYears} />
+          <MinimumDistanceSlider range={years} setRange={setYears} />
         </div>
       </div>
     </>
