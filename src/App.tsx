@@ -9,7 +9,7 @@ function App() {
 
   return (
     <span style={{ display: "flex" }}>
-      <BrowserRouter>
+      <BrowserRouter basename="/greenhouse-emissions-dashboard">
         <Routes>
           <Route path="/" element={<OverviewPage />} />
           <Route path="/compare" element={<ComparePage />} />
