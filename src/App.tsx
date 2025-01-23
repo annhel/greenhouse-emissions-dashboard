@@ -5,7 +5,7 @@ import OverviewPage from "./pages/OverviewPage";
 function App() {
   return (
     <span style={{ display: "flex" }}>
-      <HashRouter basename={""}>
+      <HashRouter basename="/greenhouse-emissions-dashboard">
         <Routes>
           <Route path="/" element={<OverviewPage />} />
           <Route path="/compare" element={<ComparePage />} />
