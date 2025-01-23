@@ -1,5 +1,6 @@
 {
   "name": "greenhouse-emissions-app",
+  "homepage": "https://annhel.github.io/greenhouse-emissions-dashboard",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -16,6 +17,7 @@
     "@types/react-dom": "^18.0.0",
     "axios": "^1.7.9",
     "axios-mock-adapter": "^2.1.0",
+    "gh-pages": "^6.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.3",
@@ -28,7 +30,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --coverage --testPathIgnorePatterns=/api",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
