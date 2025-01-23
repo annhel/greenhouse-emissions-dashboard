@@ -1,21 +1,19 @@
+import Typography from "@mui/material/Typography";
 import { BarChart } from "@mui/x-charts/BarChart";
+import { pieArcLabelClasses, PieChart } from "@mui/x-charts/PieChart";
 import { useEffect, useState } from "react";
 import { getAllEmissionsByCountry } from "../api/WorldBankApi";
+import CompareTable from "../components/CompareTable";
 import FiltersPane from "../components/FiltersPane";
 import NavPane from "../components/NavPane/NavPane";
 import { EmissionsDataResponseAndCountry } from "../types/EmissionsData";
-import { range } from "../utils/helpers";
 import {
   determinePercentChangeOfEmissions,
   determineTotalEmissions,
   getValuesFromData,
   updateTableDataWithStack,
 } from "../utils/emissionsDataProcessing";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import { pieArcLabelClasses, PieChart } from "@mui/x-charts/PieChart";
-import Table from "@mui/material/Table";
-import CompareTable from "../components/CompareTable";
+import { range } from "../utils/helpers";
 
 export default function ComparePage() {
   const [countries, setCountries] = useState<string[]>([]);
@@ -120,12 +118,29 @@ export default function ComparePage() {
     return Math.round(result * 10) / 10;
   };
 
+  const totalAggregatedEmissions = emissionsDataResponses.reduce(
+    (sum, res) => sum + (determineTotalEmissions(res.data[1]) as number),
+    0
+  );
+
+  // const[tableData, setTableData]  = useState<any>()
+
+  const determineTableDataStatistics = () => {
+
+  }
+
   const tableData = emissionsDataResponses.map((res) => {
     const percentChange = determinePercentChangeOfEmissions(res.data[1]);
-
+    const totalEmissions = determineTotalEmissions(res.data[1]);
+    const percentageOfTotal = totalEmissions
+      ? Math.round((totalEmissions / totalAggregatedEmissions) * 100 * 10) / 10
+      : null;
+  
     return {
       country: res.country,
       percentChange: percentChange,
+      totalEmissions: totalEmissions,
+      percentageOfTotal: percentageOfTotal,
     };
   });
 
@@ -170,29 +185,7 @@ export default function ComparePage() {
             <div className="display-flex align-center justify-space-between">
               <div>
                 <Typography>
-                  Proportion of Total Greenhouse Gas Emissions
-                </Typography>
-                <PieChart
-                  series={[
-                    {
-                      arcLabel: (aggregatedData) =>
-                        `${valueAsPercentTotal(aggregatedData)}%`,
-                      arcLabelMinAngle: 35,
-                      arcLabelRadius: "60%",
-                      data: dataArray,
-                    },
-                  ]}
-                  sx={{
-                    [`& .${pieArcLabelClasses.root}`]: {
-                      fontWeight: "bold",
-                    },
-                  }}
-                  {...pieParams}
-                />
-              </div>
-              <div>
-                <Typography>
-                  Percent Change of Greenhouse Gas Emissions Over Time
+                Greenhouse Gas Emissions: Percent Change and Contributions
                 </Typography>
                 <CompareTable tableData={tableData} />
               </div>

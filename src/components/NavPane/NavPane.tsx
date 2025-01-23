@@ -22,7 +22,7 @@ export default function NavPane() {
             }}
           >
             <img
-              src="/logo.png"
+              src={`${process.env.PUBLIC_URL}/logo.png`}
               alt="logo"
               width={50}
               height={50}

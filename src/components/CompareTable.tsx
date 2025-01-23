@@ -11,17 +11,21 @@ export type CompareTableProps = {
   tableData: {
     country: string;
     percentChange: { isPositive: boolean; change: number } | null;
+    totalEmissions: number | null;
+    percentageOfTotal: number | null; // Percentage of total aggregated emissions
   }[];
 };
 
 export default function CompareTable({ tableData }: CompareTableProps) {
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="percent-change-table">
+      <Table sx={{ minWidth: 650 }} aria-label="emissions-table">
         <TableHead>
           <TableRow>
             <TableCell>Country</TableCell>
             <TableCell align="right">Percent Change (%)</TableCell>
+            <TableCell align="right">Total Emissions (Mt CO₂e)</TableCell>
+            <TableCell align="right">% of Total Emissions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -36,8 +40,16 @@ export default function CompareTable({ tableData }: CompareTableProps) {
                   color: row.percentChange?.isPositive ? "green" : "red",
                 }}
               >
-                {row.percentChange
-                  ? `${row.percentChange.change}%`
+                {row.percentChange ? `${row.percentChange.change}%` : "N/A"}
+              </TableCell>
+              <TableCell align="right">
+                {row.totalEmissions !== null
+                  ? row.totalEmissions.toLocaleString()
+                  : "N/A"}
+              </TableCell>
+              <TableCell align="right">
+                {row.percentageOfTotal !== null
+                  ? `${row.percentageOfTotal}%`
                   : "N/A"}
               </TableCell>
             </TableRow>
