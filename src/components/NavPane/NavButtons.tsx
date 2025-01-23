@@ -15,12 +15,7 @@ export default function NavButtons() {
       label: "Compare",
       icon: <CompareArrows />,
       path: "/compare",
-    },
-    {
-      label: "Recent Dashboards",
-      icon: <Schedule />,
-      path: "/recent-dashboards",
-    },
+    }
   ];
 
   const isActive = (path: string) => {

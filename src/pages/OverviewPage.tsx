@@ -6,7 +6,7 @@ import NavPane from "../components/NavPane/NavPane";
 import StandardMenu from "../components/StandardMenu";
 import {
   EmissionsData,
-  EmissionsDataResponseAndCountry
+  EmissionsDataResponseAndCountry,
 } from "../types/EmissionsData";
 import { ABBRV_TO_COUNTRY, COUNTRIES_ABBREV } from "../utils/constants";
 import {
@@ -61,7 +61,10 @@ export default function OverviewPage() {
     year: -1,
     value: -1,
   };
-  const percentChange = determinePercentChangeOfEmissions(emissionsData) || -1;
+  const percentChange = determinePercentChangeOfEmissions(emissionsData) || {
+    change: -1,
+    isPositive: false,
+  };
   const years = getYearsFromData(emissionsData) || [];
   const values =
     getValuesFromData([
@@ -106,18 +109,24 @@ export default function OverviewPage() {
               <h2 className="color-primary">Key Insights</h2>
               <div className="display-flex justify-space-between width-100">
                 <DataCard
-                  value={totalEmissions}
+                  value={totalEmissions.toLocaleString("en-US")}
                   label={"Total greenhouse emissions"}
-                  insight={"From Startdate - Enddate"}
+                  insight={`From ${years[0]} - ${years[years.length - 1]}`}
                 />
                 <DataCard
-                  value={highestYear.year}
-                  label={"Highest recorded greenhouse emissions in a year"}
-                  insight={`${highestYear?.value} Mt CO2e`}
+                  value={`${highestYear?.value.toLocaleString(
+                    "en-US"
+                  )}`}
+                  label={"Highest recorded greenhouse emissions"}
+                  insight={`(Year: ${highestYear.year})`}
                 />
                 <DataCard
-                  value={percentChange}
-                  label={"% change of emissions from StartDate - EndDate"}
+                  value={`${percentChange.change}% ${
+                    percentChange.isPositive ? "Increase" : "Decrease"
+                  }`}
+                  label={`Change in emissions from ${years[0]} - ${
+                    years[years.length - 1]
+                  }`}
                 />
               </div>
             </div>
@@ -133,12 +142,6 @@ export default function OverviewPage() {
                         scaleType: "band",
                         data: years,
                         label: "Year",
-                        // colorMap: { type: "ordinal", colors: ["#94B4CC"] },
-                      },
-                    ]}
-                    yAxis={[
-                      {
-                        // max: 16000
                       },
                     ]}
                     series={values}

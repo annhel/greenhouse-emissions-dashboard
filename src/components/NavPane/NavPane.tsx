@@ -34,7 +34,6 @@ export default function NavPane() {
         </div>
         <NavButtons />
       </div>
-      {/* <CollapseButton /> */}
     </>
   );
 }

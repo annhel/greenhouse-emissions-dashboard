@@ -1,10 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from "../utils/constants";
 
-// const BASE_URL =
-//   "https://api.worldbank.org/v2/en/indicator/EN.GHG.ALL.PC.CE.AR5?downloadformat=csv";
-// export function downloadData(country: string) {}
-
 export const getAllEmissionsByCountry = async (country: string) => {
   try {
     const response = await axios.get(

@@ -7,6 +7,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Chip from "@mui/material/Chip";
+import { ABBRV_TO_COUNTRY } from "../utils/constants";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -73,7 +74,7 @@ export default function MultiSelectChip({ options, label, setSelectedOptions, se
               value={o}
               style={getStyles(o, selectedOptions, theme)}
             >
-              {o}
+              {ABBRV_TO_COUNTRY[o]}
             </MenuItem>
           ))}
         </Select>
