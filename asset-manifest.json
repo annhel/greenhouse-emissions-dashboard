@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/greenhouse-emissions-dashboard/static/css/main.406c666e.css",
-    "main.js": "/greenhouse-emissions-dashboard/static/js/main.76798ffb.js",
+    "main.js": "/greenhouse-emissions-dashboard/static/js/main.61f92a12.js",
     "index.html": "/greenhouse-emissions-dashboard/index.html",
     "main.406c666e.css.map": "/greenhouse-emissions-dashboard/static/css/main.406c666e.css.map",
-    "main.76798ffb.js.map": "/greenhouse-emissions-dashboard/static/js/main.76798ffb.js.map"
+    "main.61f92a12.js.map": "/greenhouse-emissions-dashboard/static/js/main.61f92a12.js.map"
   },
   "entrypoints": [
     "static/css/main.406c666e.css",
-    "static/js/main.76798ffb.js"
+    "static/js/main.61f92a12.js"
   ]
 }
