@@ -30,7 +30,7 @@ describe("FiltersPane", () => {
   it("displays a filter for adjusting date ranges", () => {
     doRender({});
     expect(
-        screen.getByRole("slider", { name: "Set Date Range" })
-      ).toBeVisible();
+      screen.getByRole("slider", { name: "Set Date Range" })
+    ).toBeVisible();
   });
 });

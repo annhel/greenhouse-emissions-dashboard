@@ -2,8 +2,10 @@ import {
   EmissionsData,
   EmissionsDataResponseAndCountry,
 } from "../types/EmissionsData";
+import { ABBRV_TO_COUNTRY } from "./constants";
 
 // Returns the sum of emissions for a given dataset
+// OPTIONAL: Provide a date range to limit the results
 export const determineTotalEmissions = (
   emissionsData: EmissionsData[],
   range?: number[]
@@ -32,6 +34,7 @@ export const determineTotalEmissions = (
 };
 
 // Returns the % change of emissions from the latest and first year od recorded emissions
+// OPTIONAL: Provide a date range to limit the results
 export const determinePercentChangeOfEmissions = (
   emissionsData: EmissionsData[],
   range?: number[]
@@ -102,11 +105,9 @@ export const getYearsFromData = (
     return null;
   }
 
-  // Array is reversed to return the years in ascending order
   return emissionsData
-    .slice()
-    .reverse()
-    .map((dataEntry) => dataEntry.date);
+    .map((dataEntry) => dataEntry.date)
+    .sort((a, b) => Number(a) - Number(b));
 };
 
 // Maps over emissions data responses and returns an array of all the emission values
@@ -122,24 +123,25 @@ export const getValuesFromData = (
   const dataArray = emissionsDataRes.map(
     (res: EmissionsDataResponseAndCountry) => {
       if (res?.data == null) {
-        return { data: [] };
+        return { label: res.country, data: [] };
       }
 
-      let emissionValues: number[];
+      // Sort the data by date in ascending order
+      const sortedData = res.data[1]
+        .slice()
+        .sort((a, b) => Number(a.date) - Number(b.date));
+
+      let emissionValues: number[] = [];
       if (range) {
-        emissionValues = res.data[1]
-          .slice()
-          .reverse()
+        emissionValues = sortedData
           .filter(
             (dataEntry: any) =>
-              range[0] <= dataEntry.date && range[1] >= dataEntry.date
+              range[0] <= Number(dataEntry.date) &&
+              range[1] >= Number(dataEntry.date)
           )
           .map((dataEntry: any) => dataEntry.value);
       } else {
-        emissionValues = emissionValues = res.data[1]
-          .slice()
-          .reverse()
-          .map((dataEntry: any) => dataEntry.value);
+        emissionValues = sortedData.map((dataEntry: any) => dataEntry.value);
       }
 
       return { label: res.country, data: emissionValues };
@@ -149,6 +151,7 @@ export const getValuesFromData = (
   return dataArray;
 };
 
+// Updates data to have the stack: total value, for stacked bar charts
 export function updateTableDataWithStack(data: any[]) {
   return data.map((entry: any) => ({
     ...entry,
@@ -156,6 +159,7 @@ export function updateTableDataWithStack(data: any[]) {
   }));
 }
 
+// Returns calculated values to be displayed in the CompareTable
 export const determineTableDataStatistics = (
   emissionsDataResponses: any,
   range: number[]
@@ -180,6 +184,7 @@ export const determineTableDataStatistics = (
   });
 };
 
+// Returns the sum of all emissions data for a list of country emissions data
 export const aggregateMultipleCountryEmissions = (
   emissionsDataResponses: EmissionsDataResponseAndCountry[],
   range: number[]
@@ -188,3 +193,57 @@ export const aggregateMultipleCountryEmissions = (
     (sum, res) => sum + (determineTotalEmissions(res.data[1], range) as number),
     0
   );
+
+// Returns a country' emissions data from a list
+export const findDataByCountry = (
+  emissionsDataResponses: EmissionsDataResponseAndCountry[],
+  country: string
+) => {
+  return emissionsDataResponses?.find(
+    (res) => res.country === ABBRV_TO_COUNTRY[country]
+  );
+};
+
+// Calculates the Average Emissions values for an array of country emissions data
+export const calculateAverageEmissions = (
+  data: EmissionsDataResponseAndCountry[]
+): {
+  averages: (number | null)[];
+  allYears: string[];
+} => {
+  // Gets all available years across all countries
+  const allYearsSet = new Set<string>();
+  data.forEach((countryData) => {
+    const years = getYearsFromData(countryData.data[1]);
+    if (years) {
+      years.forEach((year) => allYearsSet.add(year));
+    }
+  });
+
+  // Ensures years are in asc order
+  const allYears = Array.from(allYearsSet).sort();
+
+  // Calculate averages for each year
+  const averages = allYears.map((year) => {
+    const yearlyValues: number[] = [];
+
+    // Collect values for the current year across all countries
+    data.forEach((countryData) => {
+      const yearData = countryData.data[1].find(
+        (entry) => entry.date === year && entry.value !== null
+      );
+      if (yearData && yearData.value !== null) {
+        yearlyValues.push(yearData.value);
+      }
+    });
+
+    // Calculate the average or return null if no valid values
+    if (yearlyValues.length === 0) {
+      return null;
+    }
+    const total = yearlyValues.reduce((sum, val) => sum + val, 0);
+    return total / yearlyValues.length;
+  });
+
+  return { averages, allYears };
+};

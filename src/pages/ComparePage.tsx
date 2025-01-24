@@ -1,19 +1,13 @@
 import Typography from "@mui/material/Typography";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { pieArcLabelClasses, PieChart } from "@mui/x-charts/PieChart";
 import { useEffect, useState } from "react";
 import { getAllEmissionsByCountry } from "../api/WorldBankApi";
 import CompareTable from "../components/CompareTable";
 import FiltersPane from "../components/FiltersPane";
 import NavPane from "../components/NavPane/NavPane";
+import { EmissionsDataResponseAndCountry } from "../types/EmissionsData";
 import {
-  EmissionsData,
-  EmissionsDataResponseAndCountry,
-} from "../types/EmissionsData";
-import {
-  determinePercentChangeOfEmissions,
   determineTableDataStatistics,
-  determineTotalEmissions,
   getValuesFromData,
   updateTableDataWithStack,
 } from "../utils/emissionsDataProcessing";
@@ -27,9 +21,13 @@ export default function ComparePage() {
   >([]);
 
   const [chartValues, setChartValues] = useState<any>([]);
+  const [tableData, setTableData] = useState<any>(
+    determineTableDataStatistics(emissionsDataResponses, years)
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
+  // Fetches global emissions data
   useEffect(() => {
     const fetchEmissionsData = async () => {
       try {
@@ -85,6 +83,7 @@ export default function ComparePage() {
     }
   }, [countries]);
 
+  // Updates chart and table values if the years or emissionsdata gets updated
   useEffect(() => {
     setChartValues(
       getValuesFromData(
@@ -95,10 +94,6 @@ export default function ComparePage() {
 
     setTableData(determineTableDataStatistics(emissionsDataResponses, years));
   }, [years, emissionsDataResponses]);
-
-  const [tableData, setTableData] = useState<any>(
-    determineTableDataStatistics(emissionsDataResponses, years)
-  );
 
   return (
     <>
@@ -138,10 +133,10 @@ export default function ComparePage() {
               <h2 className="color-primary">Key Insights</h2>
             </div>
 
-            <div className="display-flex align-center justify-space-between flex-dir-col">
-              <Typography>
+            <div className="display-flex align-center justify-space-between flex-dir-col mt-3rem">
+              <h3 className="color-primary">
                 Greenhouse Gas Emissions: Percent Change and Contributions
-              </Typography>
+              </h3>
               <CompareTable tableData={tableData} />
             </div>
 

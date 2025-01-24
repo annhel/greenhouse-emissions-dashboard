@@ -4,7 +4,7 @@ import OverviewPage from "./pages/OverviewPage";
 
 function App() {
   return (
-    <span style={{ display: "flex" }}>
+    <span className="display-flex">
       <BrowserRouter basename="/greenhouse-emissions-dashboard">
         <Routes>
           <Route path="/" element={<OverviewPage />} />
