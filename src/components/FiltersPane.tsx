@@ -1,9 +1,8 @@
+import { Typography } from "@mui/material";
 import Button from "@mui/material/Button";
-import { useState } from "react";
 import { COUNTRIES_ABBREV } from "../utils/constants";
 import MinimumDistanceSlider from "./mui/MinimumDistanceSlider";
 import MultiSelectChip from "./mui/MultiSelectChip";
-import { Typography } from "@mui/material";
 
 export type FiltersPaneProps = {
   countries: string[];

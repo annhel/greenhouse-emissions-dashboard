@@ -1,4 +1,3 @@
-import Typography from "@mui/material/Typography";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { useEffect, useState } from "react";
 import { getAllEmissionsByCountry } from "../api/WorldBankApi";

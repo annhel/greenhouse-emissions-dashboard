@@ -1,9 +1,8 @@
-import React from "react";
 import "@testing-library/jest-dom";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import ComparePage from "../../pages/ComparePage";
-import axios from "axios";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import axios from "axios";
+import ComparePage from "../../pages/ComparePage";
 
 jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;

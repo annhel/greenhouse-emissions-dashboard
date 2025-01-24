@@ -1,9 +1,6 @@
-import React from "react";
 import "@testing-library/jest-dom";
+import { render, screen } from "@testing-library/react";
 import "@testing-library/user-event";
-import { render, screen, waitFor } from "@testing-library/react";
-import ComparePage from "../../pages/ComparePage";
-import axios from "axios";
 import FiltersPane, { FiltersPaneProps } from "../../components/FiltersPane";
 
 const context = describe;
