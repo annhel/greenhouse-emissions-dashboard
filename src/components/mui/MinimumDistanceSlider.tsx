@@ -43,7 +43,7 @@ export default function MinimumDistanceSlider({
         getAriaValueText={valuetext}
         disableSwap
         min={1974}
-        max={2023}
+        max={2022}
       />
     </Box>
   );

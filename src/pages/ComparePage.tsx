@@ -15,7 +15,7 @@ import { range } from "../utils/helpers";
 
 export default function ComparePage() {
   const [countries, setCountries] = useState<string[]>([]);
-  const [years, setYears] = useState<number[]>([1974, 2023]);
+  const [years, setYears] = useState<number[]>([1974, 2022]);
   const [emissionsDataResponses, setEmissionsDataResponses] = useState<
     EmissionsDataResponseAndCountry[]
   >([]);

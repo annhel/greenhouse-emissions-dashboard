@@ -24,7 +24,7 @@ describe("ComparePage", () => {
     const [startYearSlider, endYearSlider] = sliders;
 
     expect(startYearSlider).toHaveAttribute("aria-valuenow", "1974");
-    expect(endYearSlider).toHaveAttribute("aria-valuenow", "2023");
+    expect(endYearSlider).toHaveAttribute("aria-valuenow", "2022");
 
     fireEvent.change(startYearSlider, { target: { value: 1980 } });
     fireEvent.change(endYearSlider, { target: { value: 2010 } });
@@ -44,7 +44,7 @@ describe("ComparePage", () => {
     expect(combobox).toHaveTextContent("");
     const sliders = screen.getAllByRole("slider", { name: "Minimum distance" });
     expect(sliders[0]).toHaveAttribute("aria-valuenow", "1974");
-    expect(sliders[1]).toHaveAttribute("aria-valuenow", "2023");
+    expect(sliders[1]).toHaveAttribute("aria-valuenow", "2022");
   });
 
   it("displays error message if API call fails", async () => {

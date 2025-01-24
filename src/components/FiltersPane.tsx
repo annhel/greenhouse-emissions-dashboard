@@ -20,7 +20,7 @@ export default function FiltersPane({
 }: FiltersPaneProps) {
   const handleFilterReset = () => {
     setCountries([]);
-    setYears([1974, 2023]);
+    setYears([1974, 2022]);
   };
   return (
     <>
