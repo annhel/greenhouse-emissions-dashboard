@@ -17,8 +17,6 @@ import {
   getYearsFromData,
 } from "../utils/emissionsDataProcessing";
 
-export type DataOverviewPageProps = {};
-
 export default function OverviewPage() {
   const [country, setCountry] = useState<string>("US");
   const [emissionsDataResponse, setEmissionsDataResponse] =
@@ -109,24 +107,22 @@ export default function OverviewPage() {
               <h2 className="color-primary">Key Insights</h2>
               <div className="display-flex justify-space-between width-100">
                 <DataCard
-                  value={totalEmissions.toLocaleString("en-US")}
-                  label={"Total greenhouse emissions"}
-                  insight={`From ${years[0]} - ${years[years.length - 1]}`}
-                />
-                <DataCard
-                  value={`${highestYear?.value.toLocaleString(
-                    "en-US"
-                  )}`}
-                  label={"Highest recorded greenhouse emissions"}
-                  insight={`(Year: ${highestYear.year})`}
-                />
-                <DataCard
                   value={`${percentChange.change}% ${
                     percentChange.isPositive ? "Increase" : "Decrease"
                   }`}
                   label={`Change in emissions from ${years[0]} - ${
                     years[years.length - 1]
                   }`}
+                />
+                <DataCard
+                  value={totalEmissions.toLocaleString("en-US")}
+                  label={"Total greenhouse emissions"}
+                  insight={`From ${years[0]} - ${years[years.length - 1]}`}
+                />
+                <DataCard
+                  value={`${highestYear?.value.toLocaleString("en-US")}`}
+                  label={"Highest recorded greenhouse emissions"}
+                  insight={`(Year: ${highestYear.year})`}
                 />
               </div>
             </div>

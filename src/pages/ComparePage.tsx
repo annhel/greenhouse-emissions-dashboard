@@ -6,9 +6,13 @@ import { getAllEmissionsByCountry } from "../api/WorldBankApi";
 import CompareTable from "../components/CompareTable";
 import FiltersPane from "../components/FiltersPane";
 import NavPane from "../components/NavPane/NavPane";
-import { EmissionsDataResponseAndCountry } from "../types/EmissionsData";
+import {
+  EmissionsData,
+  EmissionsDataResponseAndCountry,
+} from "../types/EmissionsData";
 import {
   determinePercentChangeOfEmissions,
+  determineTableDataStatistics,
   determineTotalEmissions,
   getValuesFromData,
   updateTableDataWithStack,
@@ -88,61 +92,13 @@ export default function ComparePage() {
         years as number[]
       )
     );
-  }, [years]);
 
-  // Triggers upon changes to the fetched emissions data
-  useEffect(() => {
-    setChartValues(
-      getValuesFromData(
-        emissionsDataResponses as EmissionsDataResponseAndCountry[]
-      )
-    );
-  }, [emissionsDataResponses]);
+    setTableData(determineTableDataStatistics(emissionsDataResponses, years));
+  }, [years, emissionsDataResponses]);
 
-  const dataArray = emissionsDataResponses.map(
-    (res: EmissionsDataResponseAndCountry) => {
-      return {
-        label: res.country,
-        value: determineTotalEmissions(res.data[1]) as number,
-      };
-    }
+  const [tableData, setTableData] = useState<any>(
+    determineTableDataStatistics(emissionsDataResponses, years)
   );
-
-  const valueAsPercentTotal = (aggregatedData: any) => {
-    const total = dataArray.reduce((sum, currentValue) => {
-      return sum + (currentValue.value as number);
-    }, 0);
-
-    const result = (aggregatedData.value / total) * 100;
-
-    return Math.round(result * 10) / 10;
-  };
-
-  const totalAggregatedEmissions = emissionsDataResponses.reduce(
-    (sum, res) => sum + (determineTotalEmissions(res.data[1]) as number),
-    0
-  );
-
-  // const[tableData, setTableData]  = useState<any>()
-
-  const determineTableDataStatistics = () => {
-
-  }
-
-  const tableData = emissionsDataResponses.map((res) => {
-    const percentChange = determinePercentChangeOfEmissions(res.data[1]);
-    const totalEmissions = determineTotalEmissions(res.data[1]);
-    const percentageOfTotal = totalEmissions
-      ? Math.round((totalEmissions / totalAggregatedEmissions) * 100 * 10) / 10
-      : null;
-  
-    return {
-      country: res.country,
-      percentChange: percentChange,
-      totalEmissions: totalEmissions,
-      percentageOfTotal: percentageOfTotal,
-    };
-  });
 
   return (
     <>
@@ -182,16 +138,14 @@ export default function ComparePage() {
               <h2 className="color-primary">Key Insights</h2>
             </div>
 
-            <div className="display-flex align-center justify-space-between">
-              <div>
-                <Typography>
+            <div className="display-flex align-center justify-space-between flex-dir-col">
+              <Typography>
                 Greenhouse Gas Emissions: Percent Change and Contributions
-                </Typography>
-                <CompareTable tableData={tableData} />
-              </div>
+              </Typography>
+              <CompareTable tableData={tableData} />
             </div>
 
-            <div className="display-flex flex-dir-col align-center">
+            <div className="display-flex flex-dir-col align-center mt-3rem">
               <h3 className="color-primary">
                 Yearly Greenhouse Gas Emissions by Country (Mt CO2e)
               </h3>
@@ -208,7 +162,7 @@ export default function ComparePage() {
                 height={400}
               />
             </div>
-            <div className="display-flex flex-dir-col align-center">
+            <div className="display-flex flex-dir-col align-center mt-3rem">
               <h3 className="color-primary">
                 Cumulative Greenhouse Gas Emissions by Country (Mt CO2e)
               </h3>

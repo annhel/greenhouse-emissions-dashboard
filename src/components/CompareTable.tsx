@@ -1,18 +1,18 @@
-import * as React from "react";
+import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import { ABBRV_TO_COUNTRY } from "../utils/constants";
 
 export type CompareTableProps = {
   tableData: {
     country: string;
     percentChange: { isPositive: boolean; change: number } | null;
     totalEmissions: number | null;
-    percentageOfTotal: number | null; // Percentage of total aggregated emissions
+    percentageOfTotal: number | null; 
   }[];
 };
 
@@ -32,7 +32,7 @@ export default function CompareTable({ tableData }: CompareTableProps) {
           {tableData.map((row) => (
             <TableRow key={row.country}>
               <TableCell component="th" scope="row">
-                {row.country}
+                {ABBRV_TO_COUNTRY[row.country]}
               </TableCell>
               <TableCell
                 align="right"
@@ -40,7 +40,7 @@ export default function CompareTable({ tableData }: CompareTableProps) {
                   color: row.percentChange?.isPositive ? "green" : "red",
                 }}
               >
-                {row.percentChange ? `${row.percentChange.change}%` : "N/A"}
+                {row.percentChange?.change ? `${row.percentChange.change}%` : "N/A"}
               </TableCell>
               <TableCell align="right">
                 {row.totalEmissions !== null

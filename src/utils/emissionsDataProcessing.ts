@@ -5,33 +5,49 @@ import {
 
 // Returns the sum of emissions for a given dataset
 export const determineTotalEmissions = (
-  emissionsData: EmissionsData[]
+  emissionsData: EmissionsData[],
+  range?: number[]
 ): number | null => {
   if (!emissionsData) {
     console.warn("No emissions data provided.");
     return null;
   }
 
+  let validData = emissionsData.filter(
+    (dataEntry: EmissionsData) => dataEntry.value !== null
+  );
+
+  if (range) {
+    validData = validData.filter(
+      (dataEntry) =>
+        range[0] <= Number(dataEntry.date) && range[1] >= Number(dataEntry.date)
+    );
+  }
+
   return Math.round(
-    emissionsData
-      .filter((dataEntry: EmissionsData) => dataEntry.value !== null)
-      .reduce((sum, currentValue) => {
-        return sum + (currentValue.value as number);
-      }, 0)
+    validData.reduce((sum, currentValue) => {
+      return sum + (currentValue.value as number);
+    }, 0)
   );
 };
 
 // Returns the % change of emissions from the latest and first year od recorded emissions
 export const determinePercentChangeOfEmissions = (
-  emissionsData: EmissionsData[]
+  emissionsData: EmissionsData[],
+  range?: number[]
 ) => {
-  const validData = emissionsData.filter(
-    (dataEntry) => dataEntry.value !== null
-  );
+  let validData = emissionsData.filter((dataEntry) => dataEntry.value !== null);
 
   if (validData.length < 2) {
     console.warn("Not enough data to calculate percent change.");
     return null;
+  }
+
+  if (range) {
+    validData = validData.filter(
+      (dataEntry) =>
+        range[0] <= Number(dataEntry.date) && range[1] >= Number(dataEntry.date)
+    );
   }
 
   const latestYear = validData[0].value as number;
@@ -42,7 +58,7 @@ export const determinePercentChangeOfEmissions = (
 
   return {
     change: Math.round(result * 10) / 10,
-    isPositive: result >= 0, 
+    isPositive: result >= 0,
   };
 };
 
@@ -74,7 +90,7 @@ export const findHighestYearOfEmissions = (
   // Return only the desired fields
   return {
     year: highestEntry.date,
-    value: highestEntry.value,
+    value: Number(highestEntry.value.toFixed(1)),
   };
 };
 
@@ -139,3 +155,36 @@ export function updateTableDataWithStack(data: any[]) {
     stack: "total",
   }));
 }
+
+export const determineTableDataStatistics = (
+  emissionsDataResponses: any,
+  range: number[]
+) => {
+  const totalAggregatedEmissions = aggregateMultipleCountryEmissions(
+    emissionsDataResponses,
+    range
+  );
+  return emissionsDataResponses.map((res: EmissionsDataResponseAndCountry) => {
+    const percentChange = determinePercentChangeOfEmissions(res.data[1], range);
+    const totalEmissions = determineTotalEmissions(res.data[1], range);
+    const percentageOfTotal = totalEmissions
+      ? Math.round((totalEmissions / totalAggregatedEmissions) * 100 * 10) / 10
+      : null;
+
+    return {
+      country: res.country,
+      percentChange: percentChange,
+      totalEmissions: totalEmissions,
+      percentageOfTotal: percentageOfTotal,
+    };
+  });
+};
+
+export const aggregateMultipleCountryEmissions = (
+  emissionsDataResponses: EmissionsDataResponseAndCountry[],
+  range: number[]
+) =>
+  emissionsDataResponses.reduce(
+    (sum, res) => sum + (determineTotalEmissions(res.data[1], range) as number),
+    0
+  );
